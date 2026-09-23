@@ -100,30 +100,28 @@ Amplify Hosting のマネジメントコンソールでデプロイ設定を行�
 
 `amplify.yml` は、Amplify Hosting での[ビルドとデプロイの設定を定義するファイル](https://docs.aws.amazon.com/ja_jp/amplify/latest/userguide/yml-specification-syntax.html)です。
 
-このワークショップでは、リポジトリのルートに `amplify.yml` を配置しているため、Amplify Hosting が自動的にこの設定を読み込み、簡単にデプロイできるようになっています。
+このワークショップでは、前項でモノレポルートディレクトリに`todo-app`を指定したので、`todo-app/amplify.yml`を配置しているため、Amplify Hosting が自動的にこの設定を読み込み、簡単にデプロイできるようになっています。
 
 ```yaml
 version: 1
-applications:
-  - backend:
-      phases:
-        build:
-          commands:
-            - npm ci --cache .npm --prefer-offline
-            - npx ampx pipeline-deploy --branch $AWS_BRANCH --app-id $AWS_APP_ID
-    frontend:
-      phases:
-        build:
-          commands:
-            - npm run build
-      artifacts:
-        baseDirectory: dist
-        files:
-          - '**/*'
-      cache:
-        paths:
-          - .npm/**/*
-    appRoot: todo-app
+backend:
+  phases:
+    build:
+      commands:
+        - export NODE_OPTIONS="--conditions=cdk"
+        - npx ampx pipeline-deploy --branch $AWS_BRANCH --app-id $AWS_APP_ID
+frontend:
+  phases:
+    build:
+      commands:
+        - npm run build
+  artifacts:
+    baseDirectory: dist
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - node_modules/**/*
 ```
 
 `backend`フェーズの`npx ampx pipeline-deploy`が、`todo-app/amplify/backend.ts`経由でAmplify・Blocks両方のリソースをまとめてデプロイします（本ワークショップではAmplify・Blocksの両方が同じCDK Appの中にあるため）。
