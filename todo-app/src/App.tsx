@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { api, authApi } from 'aws-blocks'
 import { Authenticator, onAuthChange } from '@aws-blocks/blocks/ui'
-import { useChat } from '@aws-blocks/bb-agent/client'
+import { useChat as createChatClient } from '@aws-blocks/bb-agent/client'
 import './App.css'
 
 type Todo = { id: string; text: string; done: boolean; owner: string }
@@ -58,10 +58,10 @@ function TodoSection({ user }: { user: User }) {
 function ChatSection() {
   const [chatMessages, setChatMessages] = useState<{ role: string; content: string }[]>([])
   const [chatInput, setChatInput] = useState('')
-  const chatRef = useRef<ReturnType<typeof useChat> | null>(null)
+  const chatRef = useRef<ReturnType<typeof createChatClient> | null>(null)
 
   if (!chatRef.current) {
-    chatRef.current = useChat({
+    chatRef.current = createChatClient({
       api: {
         sendMessage: (conversationId, message, channelId) => api.sendChatMessage(conversationId, message, channelId),
         createConversation: () => api.createConversation(),
