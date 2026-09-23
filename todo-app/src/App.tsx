@@ -15,6 +15,24 @@ function TodoSection({ user }: { user: User }) {
 
   useEffect(() => { refresh() }, [])
 
+  // Todo更新のRealtimeチャンネルを購読し、変更のたびに自動で再取得する
+  useEffect(() => {
+    let unsubscribe: (() => void) | undefined
+    let cancelled = false
+    ;(async () => {
+      const channel = await api.getTodoChannel()
+      if (cancelled) {
+        return
+      }
+      const sub = channel.subscribe(() => { refresh() })
+      unsubscribe = () => sub.unsubscribe()
+    })()
+    return () => {
+      cancelled = true
+      unsubscribe?.()
+    }
+  }, [])
+
   async function addTodo() {
     if (text.trim() === '') {
       return

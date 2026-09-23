@@ -1,4 +1,4 @@
-import { Scope, AuthCognito, DistributedTable, ApiNamespace, Agent, BedrockModels } from '@aws-blocks/blocks';
+import { Scope, AuthCognito, DistributedTable, ApiNamespace, Agent, BedrockModels, Realtime } from '@aws-blocks/blocks';
 import { z } from 'zod';
 
 const scope = new Scope('app');
@@ -24,6 +24,12 @@ const todos = new DistributedTable(scope, 'todos', {
   key: { partitionKey: 'owner', sortKey: 'id' },
 });
 
+const todoRealtime = new Realtime(scope, 'todo-updates', {
+  namespaces: {
+    updates: Realtime.namespace(z.object({ updatedAt: z.number() })),
+  },
+});
+
 const agent = new Agent(scope, 'ai', {
   model: {
     deployed: BedrockModels.BALANCED,
@@ -40,6 +46,7 @@ const agent = new Agent(scope, 'ai', {
         const id = `todo-${Date.now().toString(36)}`;
         const todo = { id, text: input.text, done: false, owner: context.owner };
         await todos.put(todo);
+        await todoRealtime.publish('updates', context.owner, { updatedAt: Date.now() });
         return todo;
       },
     }),
@@ -60,6 +67,7 @@ const agent = new Agent(scope, 'ai', {
         }
         const updatedTodo = { ...matches[0], done: input.done };
         await todos.put(updatedTodo);
+        await todoRealtime.publish('updates', context.owner, { updatedAt: Date.now() });
         return updatedTodo;
       },
     }),
@@ -82,6 +90,7 @@ export const api = new ApiNamespace(scope, 'api', (context) => ({
     const id = `todo-${Date.now().toString(36)}`;
     const todo = { id, text, done: false, owner: user.username };
     await todos.put(todo);
+    await todoRealtime.publish('updates', user.username, { updatedAt: Date.now() });
     return todo;
   },
   // Todoの完了/未完了を切り替える
@@ -94,11 +103,18 @@ export const api = new ApiNamespace(scope, 'api', (context) => ({
     }
     const updatedTodo = { ...todo, done };
     await todos.put(updatedTodo);
+    await todoRealtime.publish('updates', owner, { updatedAt: Date.now() });
   },
   // Todoを削除する
   async deleteTodo(id: string) {
     const user = await auth.requireAuth(context);
     await todos.delete({ owner: user.username, id });
+    await todoRealtime.publish('updates', user.username, { updatedAt: Date.now() });
+  },
+  // Todo更新のRealtimeチャンネルを取得する
+  async getTodoChannel() {
+    const user = await auth.requireAuth(context);
+    return todoRealtime.getChannel('updates', user.username);
   },
   // 新しい会話を開始する
   async createConversation() {
