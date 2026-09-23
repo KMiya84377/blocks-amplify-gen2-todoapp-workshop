@@ -6,14 +6,21 @@ Todo アプリをホスティングします。
 
 ### ビルドコマンドの確認
 
-ビルドコマンドでエラーが発生しないか、確認しておきましょう。
+型エラーが発生しないか、確認しておきましょう。
 
 ```shell
 cd todo-app
-npm run build
+npx tsc -b
 ```
 
 エラーがあれば修正し、忘れずにコミットしておきましょう。
+
+> [!NOTE] `npm run build`ではなく`npx tsc -b`を使う理由
+>
+> この時点では`amplify_outputs.json`（`npm run sandbox`実行後に生成される）がまだ存在しないため、
+> `npm run build`（`vite build`を含む）を実行すると`aws-blocks/client.js`の
+> `../amplify_outputs.json`読み込みでエラーになります。ここでは型エラーの有無だけを
+> 確認したいので、型チェックのみ行う`npx tsc -b`を使います。
 
 ### AWSへのログイン
 
