@@ -182,6 +182,12 @@ export const api = new ApiNamespace(scope, 'api', (context) => ({
 ↓ チャット欄を追加した版
 ![alt text](img/image-3-1.png)
 
+> [!NOTE] `useChat`を`createChatClient`としてimportする理由
+>
+> `useChat`という名前ですが、内部で`useState`等のReactフックを使わないただの関数です。
+> `use`から始まる名前だとlintツールがReactフックと誤認してしまうため、
+> `createChatClient`という別名でimportしています。
+
 <details>
 <summary>src/App.tsx(全文)</summary>
 
@@ -189,7 +195,7 @@ export const api = new ApiNamespace(scope, 'api', (context) => ({
 import { useEffect, useRef, useState } from 'react'
 import { api, authApi } from 'aws-blocks'
 import { Authenticator, onAuthChange } from '@aws-blocks/blocks/ui'
-import { useChat } from '@aws-blocks/bb-agent/client'
+import { useChat as createChatClient } from '@aws-blocks/bb-agent/client'
 import './App.css'
 
 type Todo = { id: string; text: string; done: boolean; owner: string }
@@ -246,10 +252,10 @@ function TodoSection({ user }: { user: User }) {
 function ChatSection() {
   const [chatMessages, setChatMessages] = useState<{ role: string; content: string }[]>([])
   const [chatInput, setChatInput] = useState('')
-  const chatRef = useRef<ReturnType<typeof useChat> | null>(null)
+  const chatRef = useRef<ReturnType<typeof createChatClient> | null>(null)
 
   if (!chatRef.current) {
-    chatRef.current = useChat({
+    chatRef.current = createChatClient({
       api: {
         sendMessage: (conversationId, message, channelId) => api.sendChatMessage(conversationId, message, channelId),
         createConversation: () => api.createConversation(),
