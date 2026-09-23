@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { api, authApi } from 'aws-blocks'
 import { Authenticator, onAuthChange } from '@aws-blocks/blocks/ui'
+import { useChat } from '@aws-blocks/bb-agent/client'
 import './App.css'
 
 type Todo = { id: string; text: string; done: boolean; owner: string }
@@ -54,6 +55,58 @@ function TodoSection({ user }: { user: User }) {
   )
 }
 
+function ChatSection() {
+  const [chatMessages, setChatMessages] = useState<{ role: string; content: string }[]>([])
+  const [chatInput, setChatInput] = useState('')
+  const chatRef = useRef<ReturnType<typeof useChat> | null>(null)
+
+  if (!chatRef.current) {
+    chatRef.current = useChat({
+      api: {
+        sendMessage: (conversationId, message, channelId) => api.sendChatMessage(conversationId, message, channelId),
+        createConversation: () => api.createConversation(),
+        getConversation: (id) => api.getChatHistory(id),
+      },
+      subscribe: async (channelId, handler) => {
+        const channel = await api.getAgentChannel(channelId)
+        return channel.subscribe(handler)
+      },
+      onMessagesChange: (messages) => setChatMessages(messages),
+    })
+  }
+
+  const sendChat = async () => {
+    if (!chatInput.trim()) {
+      return
+    }
+    await chatRef.current!.sendMessage(chatInput.trim())
+    setChatInput('')
+  }
+
+  return (
+    <section id="chat">
+      <h2>Todoアシスタント</h2>
+      <ul className="chat-list">
+        {chatMessages.map((m, i) => (
+          <li key={i} className={`chat-message ${m.role}`}>
+            <span className="chat-role">{m.role}</span>
+            <span>{m.content}</span>
+          </li>
+        ))}
+      </ul>
+      <div className="chat-input">
+        <input
+          value={chatInput}
+          onChange={(e) => setChatInput(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && sendChat()}
+          placeholder="牛乳を買うタスクを追加して"
+        />
+        <button onClick={sendChat}>送信</button>
+      </div>
+    </section>
+  )
+}
+
 function App() {
   const authRef = useRef<HTMLDivElement>(null)
   const mounted = useRef(false)
@@ -78,6 +131,7 @@ function App() {
   return (
     <div className="app-layout" key="app">
       <TodoSection user={user} />
+      <ChatSection />
     </div>
   )
 }
