@@ -1,32 +1,61 @@
-import { ApiNamespace, Scope, AuthCognito } from '@aws-blocks/blocks';
-// import { KVStore } from '@aws-blocks/bb-kv-store';
-// import { CognitoVerifier } from './cognito-verifier.js';
+import { Scope, AuthCognito, DistributedTable, ApiNamespace } from '@aws-blocks/blocks';
+import { z } from 'zod';
 
-const scope = new Scope('todo-app');
+const scope = new Scope('app');
 
-// const store = new KVStore(scope, 'notes', {});
+const auth = new AuthCognito(scope, 'auth', {
+  passwordPolicy: {
+    minLength: 8,
+    requireDigits: true
+  },
+});
 
-// const auth = new CognitoVerifier({
-//   userPoolId: process.env.COGNITO_USER_POOL_ID!,
-//   clientId: process.env.COGNITO_CLIENT_ID!,
-//   tokenUse: 'id',
-// });
+export const authApi = auth.createApi();
 
-// export const api = new ApiNamespace(scope, 'api', (context) => ({
-//   // Public — no auth required
-//   async greet(name: string) {
-//     return { message: `Hello from Blocks, ${name}!`, timestamp: Date.now() };
-//   },
+const todoSchema = z.object({
+  id: z.string(),
+  text: z.string(),
+  done: z.boolean(),
+  owner: z.string(),
+});
 
-//   // Protected — requires signed-in user
-//   async putNote(key: string, value: string) {
-//     const user = await auth.requireAuth(context);
-//     await store.put(`${user.sub}:${key}`, value);
-//     return { success: true };
-//   },
+const todos = new DistributedTable(scope, 'todos', {
+  schema: todoSchema,
+  key: { partitionKey: 'owner', sortKey: 'id' },
+});
 
-//   async getNote(key: string) {
-//     const user = await auth.requireAuth(context);
-//     return { value: await store.get(`${user.sub}:${key}`) };
-//   },
-// }));
+export const api = new ApiNamespace(scope, 'api', (context) => ({
+  // 自分のTodoを一覧取得する
+  async listTodos() {
+    const user = await auth.requireAuth(context);
+    const results = [];
+    for await (const todo of todos.query({ where: { owner: { equals: user.username } } })) {
+      results.push(todo);
+    }
+    return results;
+  },
+  // Todoを新しく追加する
+  async createTodo(text: string) {
+    const user = await auth.requireAuth(context);
+    const id = `todo-${Date.now().toString(36)}`;
+    const todo = { id, text, done: false, owner: user.username };
+    await todos.put(todo);
+    return todo;
+  },
+  // Todoの完了/未完了を切り替える
+  async toggleTodo(id: string, done: boolean) {
+    const user = await auth.requireAuth(context);
+    const owner = user.username;
+    const todo = await todos.get({ owner, id });
+    if (!todo) {
+      throw new Error('not found');
+    }
+    const updatedTodo = { ...todo, done };
+    await todos.put(updatedTodo);
+  },
+  // Todoを削除する
+  async deleteTodo(id: string) {
+    const user = await auth.requireAuth(context);
+    await todos.delete({ owner: user.username, id });
+  },
+}));
