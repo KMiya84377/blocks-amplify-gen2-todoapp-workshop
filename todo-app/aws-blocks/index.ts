@@ -1,4 +1,4 @@
-import { Scope, AuthCognito, DistributedTable, ApiNamespace, Agent, BedrockModels, Realtime } from '@aws-blocks/blocks';
+import { Scope, AuthCognito, DistributedTable, ApiNamespace, Agent, BedrockModels, Realtime, KnowledgeBase } from '@aws-blocks/blocks';
 import { z } from 'zod';
 
 const scope = new Scope('app');
@@ -28,6 +28,11 @@ const todoRealtime = new Realtime(scope, 'todo-updates', {
   namespaces: {
     updates: Realtime.namespace(z.object({ updatedAt: z.number() })),
   },
+});
+
+const petsKb = new KnowledgeBase(scope, 'pets', {
+  source: './knowledge',
+  description: '飼っているペットの餌やりルール',
 });
 
 const agent = new Agent(scope, 'ai', {
@@ -69,6 +74,14 @@ const agent = new Agent(scope, 'ai', {
         await todos.put(updatedTodo);
         await todoRealtime.publish('updates', context.owner, { updatedAt: Date.now() });
         return updatedTodo;
+      },
+    }),
+    searchPetInfo: tool({
+      description: 'ペットの餌やりルール（名前・餌の種類・量・時間）を検索する',
+      parameters: z.object({ query: z.string().describe('検索したい内容（例: モモの餌、餌やりのタスク）') }),
+      handler: async ({ input }) => {
+        const results = await petsKb.retrieve(input.query, { maxResults: 3 });
+        return results.map((r) => r.text);
       },
     }),
   }),
