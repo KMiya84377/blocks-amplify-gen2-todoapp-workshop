@@ -1,9 +1,9 @@
 {
   "name": "Ubuntu",
-  "image": "mcr.microsoft.com/devcontainers/typescript-node",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:24-bookworm",
   "features": {
     "ghcr.io/devcontainers/features/aws-cli:1": {
-      "version": "2.36.25"
+      "version": "2.37.0"
     }
   },
   "customizations": {

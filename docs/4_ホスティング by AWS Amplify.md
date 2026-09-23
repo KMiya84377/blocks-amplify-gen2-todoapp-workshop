@@ -1,22 +1,65 @@
-# ホスティング
+# ホスティング by AWS Amplify
 
 Todo アプリをホスティングします。
 
-## 下準備
+## Sandboxへのデプロイ
 
 ### ビルドコマンドの確認
 
 ビルドコマンドでエラーが発生しないか、確認しておきましょう。
 
 ```shell
+cd todo-app
 npm run build
 ```
 
 エラーがあれば修正し、忘れずにコミットしておきましょう。
 
-### AWSへのデプロイ確認
+### AWSへのログイン
 
-ここまでは`npm run blocks:dev`のローカルモックだけで進めてきました。ここで一度、実際にAWSへデプロイして動作確認します。
+ここまでは`npm run blocks:dev`のローカルモックだけで進めてきました。
+ここで初めてAWSへのログインが必要になります。
+
+`aws login` コマンドを利用します。詳細な情報は[公式ドキュメント](https://docs.aws.amazon.com/ja_jp/signin/latest/userguide/command-line-sign-in.html#command-line-sign-in-local-development)をご覧ください。
+
+#### マネージメントコンソールへのログイン
+
+まず、AWS マネジメントコンソールにサインインしてください。
+
+[AWS マネジメントコンソール リンク](https://console.aws.amazon.com/console/home/?nc2=h_si&src=header-signin)
+
+リージョンをバージニア北部（us-east-1）に切り替えてください。
+
+> [!WARNING] Admin相当権限を推奨
+>
+> スムーズな進行のためには、Admin 相当権限でサインインすることをお勧めします。
+
+#### CLI のログイン
+
+次に、CLI のログインを実行します。
+
+```shell
+aws login --remote
+> AWS Region [us-east-1]: # そのまま Enter
+
+# URL が表示されるのでクリックし、verification code を取得する
+# verification code を CLI に入力し、認証を完了させる
+
+# `Updated profile default to use arn:aws:iam::~ credentials.` と表示されれば完了です。
+
+# ログイン完了を確認する
+aws sts get-caller-identity
+```
+
+> [!WARNING] MFA必須アカウントの制約
+>
+> 本ワークショップにおいて、MFA 必須のアカウントでは `aws login` コマンドで完遂できない可能性があります。
+>
+> その場合は別の方法でクレデンシャルの設定を実施してください。
+
+### Sandboxへのデプロイ確認
+
+ここで一度、実際にAWSへデプロイして動作確認します。
 
 ```shell
 npm run sandbox
@@ -24,11 +67,11 @@ npm run sandbox
 
 `File written: amplify_outputs.json` と表示されれば完了です。実際に画面を操作し、Sandbox環境（本物のAWSリソース）でもTodo追加・AIアシスタントとのチャットが動作することを確認してください。
 
-> [!NOTE]
+> [!NOTE] モックデータとSandbox環境のデータは別
 >
 > `npm run blocks:dev`のモックデータ（`.bb-data/`）と、Sandbox環境のデータは別物です。ユーザーもTodoも引き継がれません。
 
-## デプロイ設定
+## AWS Amplify Hostingでのデプロイ
 
 **作業目安：10分**
 
@@ -49,9 +92,9 @@ Amplify Hosting のマネジメントコンソールでデプロイ設定を行�
 `デプロイ済み` と表示されれば完了です。
 「ドメイン」と表示されている下の URL にアクセスして、実装した Todo アプリが表示されれば完成です。
 
-> [!NOTE]
+> [!NOTE] Sandbox環境とは別のアプリケーション
 >
-> Sandbox 環境とは別のアプリケーションです。ユーザーや作成したデータは引き継がれませんので、ご注意ください。
+> ユーザーや作成したデータは引き継がれませんので、ご注意ください。
 
 ### amplify.yml について
 
@@ -83,6 +126,6 @@ applications:
     appRoot: todo-app
 ```
 
-`backend`フェーズの`npx ampx pipeline-deploy`が、`amplify/backend.ts`経由でAmplify・Blocks両方のリソースをまとめてデプロイします（本ワークショップではAmplify・Blocksの両方が同じCDK Appの中にあるため）。
+`backend`フェーズの`npx ampx pipeline-deploy`が、`todo-app/amplify/backend.ts`経由でAmplify・Blocks両方のリソースをまとめてデプロイします（本ワークショップではAmplify・Blocksの両方が同じCDK Appの中にあるため）。
 
-ここまで確認できたら、次のステップ（[docs/5_後処理.md](5_後処理.md)）に進んでください。
+ここまで確認できたら、次のステップ（[docs/5_おまけ Todo一覧のリアルタイム自動更新.md](5_おまけ%20Todo一覧のリアルタイム自動更新.md)）に進んでください。
