@@ -32,7 +32,12 @@ export async function createBlocksBackend(stack: Stack, sandboxMode: boolean) {
           // 転送ドメイン経由で配信するため、デフォルトのlocalhost許可に追加する。
           allowedOrigins: [...BlocksPresets.sandbox.allowedOrigins, 'https://.*\\.app\\.github\\.dev'],
         }
-      : BlocksPresets.production,
+      : {
+          ...BlocksPresets.production,
+          // Amplify HostingのブランチURL(https://<branch>.<appId>.amplifyapp.com)からの
+          // APIリクエストを許可する。productionプリセットはデフォルトで全オリジン拒否のため。
+          allowedOrigins: ['https://.*\\.amplifyapp\\.com'],
+        },
   });
 
   return blocks;
