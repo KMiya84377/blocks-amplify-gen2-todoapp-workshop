@@ -20,13 +20,6 @@ npx tsc -b
 
 エラーがあれば修正し、忘れずにコミットしておきましょう。
 
-> [!NOTE] `npm run build`ではなく`npx tsc -b`を使う理由
->
-> この時点では`amplify_outputs.json`（`npm run sandbox`実行後に生成される）がまだ存在しないため、
-> `npm run build`（`vite build`を含む）を実行すると`aws-blocks/client.js`の
-> `../amplify_outputs.json`読み込みでエラーになります。ここでは型エラーの有無だけを
-> 確認したいので、型チェックのみ行う`npx tsc -b`を使います。
-
 ### AWSへのログイン
 
 ここまでは`npm run blocks:dev`のローカルモックだけで進めてきました。
@@ -53,13 +46,16 @@ npx tsc -b
 ```shell
 aws login --remote
 > AWS Region [us-east-1]: # そのまま Enter
+```
 
-# URL が表示されるのでクリックし、verification code を取得する
-# verification code を CLI に入力し、認証を完了させる
+URL が表示されるのでクリックし、verification code を取得します。
 
-# `Updated profile default to use arn:aws:iam::~ credentials.` と表示されれば完了です。
+verification code を CLI に入力し、認証を完了させます。
 
-# ログイン完了を確認する
+`Updated profile default to use arn:aws:iam::~ credentials.` と表示されれば完了です。
+
+ログイン完了を確認します。自身のアカウントが表示されればOKです。
+```shell
 aws sts get-caller-identity
 ```
 
@@ -77,7 +73,18 @@ aws sts get-caller-identity
 npm run sandbox
 ```
 
-`File written: amplify_outputs.json` と表示されれば完了です。実際に画面を操作し、Sandbox環境（本物のAWSリソース）でもTodo追加・AIアシスタントとのチャットが動作することを確認してください。
+`File written: amplify_outputs.json` と表示されれば完了です。
+
+Sandboxはバックエンドだけをデプロイするもので、フロントエンドは引き続きローカルで動かします。
+新しいターミナルで`npm run dev`を起動し、`http://localhost:5173/`にアクセスしてください。
+
+```shell
+# 新しいターミナルを起動
+cd todo-app
+npm run dev
+```
+
+実際に画面を操作し、Sandbox環境（本物のAWSリソース）でもTodo追加・AIアシスタントとのチャットが動作することを確認してください。
 
 > [!NOTE] モックデータとSandbox環境のデータは別
 >
