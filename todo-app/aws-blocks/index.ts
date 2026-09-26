@@ -1,7 +1,7 @@
 import { Scope, AuthCognito, DistributedTable, ApiNamespace, Agent, BedrockModels } from '@aws-blocks/blocks';
 import { z } from 'zod';
 
-const scope = new Scope('app');
+const scope = new Scope('a');
 
 const auth = new AuthCognito(scope, 'auth', {
   passwordPolicy: {
