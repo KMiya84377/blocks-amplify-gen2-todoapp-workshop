@@ -32,7 +32,6 @@ import { z } from 'zod';
 const agent = new Agent(scope, 'ai', {
   model: {
     deployed: BedrockModels.BALANCED,
-    local: { provider: 'bedrock', modelId: 'moonshotai.kimi-k2.5' },
   },
   streamingMode: 'token',
   systemPrompt: 'あなたはTodoアプリのアシスタントです。ユーザーの指示に応じてTodoを追加・完了します。',
@@ -43,19 +42,27 @@ const agent = new Agent(scope, 'ai', {
 });
 ```
 
-> [!NOTE] localに指定できる選択肢
+> [!NOTE] localの設定について
 >
-> AWSへデプロイした際は`deployed: BedrockModels.BALANCED`が使われ、Amazon Bedrockを呼び出します。`local`(`npm run blocks:dev`でのローカル開発中に使われる設定)は、以下のいずれかから選べます。
+> AWSへデプロイした際は`deployed: BedrockModels.BALANCED`が使われ、Amazon Bedrockを呼び出します。
+> `local`(`npm run blocks:dev`でのローカル開発中に使われる設定)は未指定のままでOKです（本物のAI応答ではないモックになりますが、エラーにはならずアプリとしては動作します）。
+> 以下のいずれかを使いたい場合は、`model`に`local`を追記してください。
 >
 > | 選択肢 | 項目 | 状況 |
 > |---|---|---|
 > | A | ローカルLLM(Ollama) | メモリ8GB以上を確保できる環境がある |
 > | B | Bedrock APIキー | メモリの余裕がないが、ネットワークは使える |
-> | C | モック | どちらも用意できない |
+> | (追記なし) | モック | どちらも用意できない |
 
-> [!NOTE] OllamaなどローカルLLMを使う場合
+> [!NOTE] B: Bedrock APIキーを使う場合
 >
-> APIキーが無い、またはワークショップ当日にネットワークが使えない場合は、以下の代わりの手段もあります。
+> 手順1で`AWS_BEARER_TOKEN_BEDROCK`を設定済みであることを確認し、`local`に以下を追記します。
+>
+> ```typescript
+> local: { provider: 'bedrock', modelId: 'moonshotai.kimi-k2.5' },
+> ```
+
+> [!NOTE] A: OllamaなどローカルLLMを使う場合
 >
 > <details>
 > <summary>ローカルLLM(Ollama)を使う場合</summary>
@@ -85,10 +92,6 @@ const agent = new Agent(scope, 'ai', {
 > `import`文に`OllamaModels`を追加し、`local`は`OllamaModels.SMALL`を指定します。
 >
 > </details>
-
-> [!NOTE] モックを使う場合
->
-> `local`を未指定にしてください。本物のAI応答ではありませんが、エラーにはならずアプリとしては動作します。
 
 4. `addTodo`ツール（Todoを新しく追加する）を実装します。
 
