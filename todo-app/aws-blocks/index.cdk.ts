@@ -4,8 +4,7 @@
  * This file is imported by amplify/blocks.ts to wire Blocks into the Amplify backend.
  * It is NOT a standalone CDK app — Amplify's `ampx` CLI orchestrates synthesis.
  */
-import { BlocksBackend, SandboxDisableDeletionProtection } from '@aws-blocks/blocks/cdk';
-import { RemovalPolicies, Mixins } from 'aws-cdk-lib';
+import { BlocksBackend, BlocksPresets } from '@aws-blocks/blocks/cdk';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import type { Stack } from 'aws-cdk-lib';
@@ -26,19 +25,15 @@ export async function createBlocksBackend(stack: Stack, sandboxMode: boolean) {
   const blocks = await BlocksBackend.create(stack, 'blocks', {
     backendHandlerPath: join(__dirname, 'index.handler.ts'),
     backendCDKPath: join(__dirname, 'index.ts'),
+    defaults: sandboxMode
+      ? {
+          ...BlocksPresets.sandbox,
+          // GitHub Codespacesはフロントエンドをlocalhostではなく*.app.github.devの
+          // 転送ドメイン経由で配信するため、デフォルトのlocalhost許可に追加する。
+          allowedOrigins: [...BlocksPresets.sandbox.allowedOrigins, 'https://.*\\.app\\.github\\.dev'],
+        }
+      : BlocksPresets.production,
   });
-
-  // In sandbox mode, make all resources deletable so teardown succeeds cleanly.
-  if (sandboxMode) {
-    RemovalPolicies.of(stack).destroy();
-    Mixins.of(stack).apply(new SandboxDisableDeletionProtection());
-    // GitHub Codespacesはフロントエンドをlocalhostではなく*.app.github.devの
-    // 転送ドメイン経由で配信するため、デフォルトのlocalhost許可だけではCORSに弾かれる。
-    blocks.handler.addEnvironment(
-      'CORS_ALLOWED_ORIGINS',
-      '^https?://(localhost|127\\.0\\.0\\.1)(:\\d+)?$,https://.*\\.app\\.github\\.dev'
-    );
-  }
 
   return blocks;
 }
