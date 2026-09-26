@@ -8,6 +8,7 @@ const auth = new AuthCognito(scope, 'auth', {
     minLength: 8,
     requireDigits: true
   },
+  crossDomain: true,
 });
 
 export const authApi = auth.createApi();
