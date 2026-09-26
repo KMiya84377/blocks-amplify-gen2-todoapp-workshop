@@ -32,6 +32,12 @@ export async function createBlocksBackend(stack: Stack, sandboxMode: boolean) {
   if (sandboxMode) {
     RemovalPolicies.of(stack).destroy();
     Mixins.of(stack).apply(new SandboxDisableDeletionProtection());
+    // GitHub Codespacesはフロントエンドをlocalhostではなく*.app.github.devの
+    // 転送ドメイン経由で配信するため、デフォルトのlocalhost許可だけではCORSに弾かれる。
+    blocks.handler.addEnvironment(
+      'CORS_ALLOWED_ORIGINS',
+      '^https?://(localhost|127\\.0\\.0\\.1)(:\\d+)?$,https://.*\\.app\\.github\\.dev'
+    );
   }
 
   return blocks;
