@@ -76,7 +76,15 @@ npm run sandbox
 `File written: amplify_outputs.json` と表示されれば完了です。
 
 Sandboxはバックエンドだけをデプロイするもので、フロントエンドは引き続きローカルで動かします。
-新しいターミナルで`npm run dev`を起動し、`http://localhost:5173/`にアクセスしてください。
+ただし、ここまで`npm run blocks:dev`で起動していた場合、`aws-blocks/client.js`はローカルサーバー（`localhost:3001`）向けのままです。
+Sandbox（本物のAWSリソース）に接続するには、`client.js`を作り直す必要があります。
+
+```shell
+npm run blocks:generate-client
+```
+
+このコマンドで、`client.js`が`amplify_outputs.json`記載の本物のAPI URLを向くようになります。
+その後、新しいターミナルで`npm run dev`を起動し、`http://localhost:5173/`にアクセスしてください。
 
 ```shell
 # 新しいターミナルを起動
@@ -89,6 +97,12 @@ npm run dev
 > [!NOTE] モックデータとSandbox環境のデータは別
 >
 > `npm run blocks:dev`のモックデータ（`.bb-data/`）と、Sandbox環境のデータは別物です。ユーザーもTodoも引き継がれません。
+
+> [!NOTE] ローカル開発に戻る場合
+>
+> 5章・6章など、この後もローカル(`npm run blocks:dev`)での開発に戻る場合は、
+> `npm run blocks:dev`を実行し直せば`client.js`は自動でローカル向けに戻ります。
+> 専用のコマンドを別途実行する必要はありません。
 
 ## AWS Amplify Hostingでのデプロイ
 
