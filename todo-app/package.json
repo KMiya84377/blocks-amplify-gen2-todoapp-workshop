@@ -37,5 +37,8 @@
   },
   "workspaces": [
     "aws-blocks"
-  ]
+  ],
+  "overrides": {
+    "@aws-sdk/client-cloudformation": "3.750.0"
+  }
 }
