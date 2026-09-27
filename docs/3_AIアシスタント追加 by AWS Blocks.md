@@ -32,6 +32,7 @@ import { z } from 'zod';
 const agent = new Agent(scope, 'ai', {
   model: {
     deployed: BedrockModels.BALANCED,
+    local: { provider: 'bedrock', modelId: 'moonshotai.kimi-k2.5' },
   },
   streamingMode: 'token',
   systemPrompt: 'あなたはTodoアプリのアシスタントです。ユーザーの指示に応じてTodoを追加・完了します。',
@@ -43,24 +44,9 @@ const agent = new Agent(scope, 'ai', {
 ```
 
 > **localの設定について**
-> AWSへデプロイした際は`deployed: BedrockModels.BALANCED`が使われ、Amazon Bedrockを呼び出します。
-> `local`(`npm run blocks:dev`でのローカル開発中に使われる設定)は未指定のままでOKです（本物のAI応答ではないモックになりますが、エラーにはならずアプリとしては動作します）。
-> 以下のいずれかを使いたい場合は、`model`に`local`を追記してください。
->
-> | 選択肢 | 項目 | 状況 |
-> |---|---|---|
-> | A | ローカルLLM(Ollama) | メモリ8GB以上を確保できる環境がある |
-> | B | Bedrock APIキー | メモリの余裕がないが、ネットワークは使える |
-> | (追記なし) | モック | どちらも用意できない |
+> `local`には、手順1で設定した`AWS_BEARER_TOKEN_BEDROCK`を使ってBedrockを呼び出す設定を入れています。
 
-> **B: Bedrock APIキーを使う場合**
-> 手順1で`AWS_BEARER_TOKEN_BEDROCK`を設定済みであることを確認し、`local`に以下を追記します。
->
-> ```typescript
-> local: { provider: 'bedrock', modelId: 'moonshotai.kimi-k2.5' },
-> ```
-
-> **A: OllamaなどローカルLLMを使う場合**
+> **OllamaなどローカルLLMを使う場合**
 > <details>
 > <summary>ローカルLLM(Ollama)を使う場合</summary>
 >
@@ -177,15 +163,10 @@ export const api = new ApiNamespace(scope, 'api', (context) => ({
 
 **作業目安：15分**
 
-1. `todo-app/src/App.tsx`に、`useChat`のimport・初期化・チャット欄のUIを追加します。
-
-↓ チャット欄を追加した版
+フロントエンドへのチャットUIを追加します。
 ![alt text](img/image-3-1.png)
 
-> **`useChat`を`createChatClient`としてimportする理由**
-> `useChat`という名前ですが、内部で`useState`等のReactフックを使わないただの関数です。
-> `use`から始まる名前だとlintツールがReactフックと誤認してしまうため、
-> `createChatClient`という別名でimportしています。
+1. `todo-app/src/App.tsx`に、`useChat`のimport・初期化・チャット欄のUIを追加します。
 
 <details>
 <summary>src/App.tsx(全文)</summary>
@@ -335,10 +316,14 @@ export default App
 
 <br>
 
+> **`useChat`を`createChatClient`としてimportする理由**
+> `useChat`という名前ですが、内部で`useState`等のReactフックを使わないただの関数です。
+> `use`から始まる名前だとlintツールがReactフックと誤認してしまうため、`createChatClient`という別名でimportしています。
+
+
 2. チャット欄に「牛乳を買うタスクを追加して」のように入力します。
 
 3. 画面をリロードすると、Todo一覧に反映されていることを確認できます。
 
 問題なければ、ここまでの成果をコミットしておきましょう。
-
 ここまで確認できたら、次のステップ（[docs/4_ホスティング by AWS Amplify.md](4_ホスティング%20by%20AWS%20Amplify.md)）に進んでください。
