@@ -34,6 +34,7 @@ const todoRealtime = new Realtime(scope, 'todo-updates', {
 const agent = new Agent(scope, 'ai', {
   model: {
     deployed: BedrockModels.BALANCED,
+    local: { provider: 'bedrock', modelId: 'moonshotai.kimi-k2.5' },
   },
   streamingMode: 'token',
   systemPrompt: 'あなたはTodoアプリのアシスタントです。ユーザーの指示に応じてTodoを追加・完了します。',
