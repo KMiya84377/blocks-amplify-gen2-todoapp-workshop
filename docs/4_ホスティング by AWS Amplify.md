@@ -66,6 +66,9 @@ aws sts get-caller-identity
 
 ここで一度、実際にAWSへデプロイして動作確認します。
 
+> **デプロイ後は課金が発生します**
+> デプロイ後のAIアシスタントは、`local`(Bedrock APIキー)ではなく`deployed: BedrockModels.BALANCED`(Claude Sonnet 4.6、IAMロールで認証)を呼び出します。Amazon Bedrockの実際の呼び出しとして課金対象になります。
+
 ```shell
 npm run sandbox
 ```
