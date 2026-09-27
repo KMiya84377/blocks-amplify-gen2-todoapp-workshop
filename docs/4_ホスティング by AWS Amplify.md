@@ -6,6 +6,9 @@ AWS Amplify Hostingを使用して、TodoアプリをAWS上でホスティング
 > AWS Blocksはローカル環境だけで開発が完結する仕組みなので、AWSアカウントが無くても3章までの内容はすべて動作します。
 > AWSアカウントの準備ができていない方は、本章はスキップして構いません。
 
+> **デプロイ後は課金が発生します**
+> デプロイ後のAIアシスタントは、`local`(Bedrock APIキー)ではなく`deployed: BedrockModels.BALANCED`(Claude Sonnet 4.6、IAMロールで認証)を呼び出します。Amazon Bedrockの実際の呼び出しとして課金対象になります。
+
 ## Sandboxへのデプロイ
 
 ### ビルドコマンドの確認
@@ -65,9 +68,6 @@ aws sts get-caller-identity
 ### Sandboxへのデプロイ確認
 
 ここで一度、実際にAWSへデプロイして動作確認します。
-
-> **デプロイ後は課金が発生します**
-> デプロイ後のAIアシスタントは、`local`(Bedrock APIキー)ではなく`deployed: BedrockModels.BALANCED`(Claude Sonnet 4.6、IAMロールで認証)を呼び出します。Amazon Bedrockの実際の呼び出しとして課金対象になります。
 
 ```shell
 npm run sandbox
