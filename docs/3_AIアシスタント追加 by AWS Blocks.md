@@ -44,8 +44,7 @@ const agent = new Agent(scope, 'ai', {
 ```
 
 > **localの設定について**
-> `local`(`npm run blocks:dev`でのローカル開発中に使われる設定)には、手順1で設定した`AWS_BEARER_TOKEN_BEDROCK`を使ってBedrockを呼び出す設定を入れています。`deployed`側の`BedrockModels.BALANCED`とは別に、`local`用のモデルID(`moonshotai.kimi-k2.5`)を明示的に指定しています。
-> メモリに余裕がありネットワークを使いたくない場合は、以下のOllamaに切り替えることもできます。
+> `local`には、手順1で設定した`AWS_BEARER_TOKEN_BEDROCK`を使ってBedrockを呼び出す設定を入れています。`deployed`側の`BedrockModels.BALANCED`とは別に、`local`用のモデルID(`moonshotai.kimi-k2.5`)を明示的に指定しています。
 
 > **OllamaなどローカルLLMを使う場合**
 > <details>
