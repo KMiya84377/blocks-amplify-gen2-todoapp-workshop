@@ -42,8 +42,7 @@ const agent = new Agent(scope, 'ai', {
 });
 ```
 
-> [!NOTE] localの設定について
->
+> **localの設定について**
 > AWSへデプロイした際は`deployed: BedrockModels.BALANCED`が使われ、Amazon Bedrockを呼び出します。
 > `local`(`npm run blocks:dev`でのローカル開発中に使われる設定)は未指定のままでOKです（本物のAI応答ではないモックになりますが、エラーにはならずアプリとしては動作します）。
 > 以下のいずれかを使いたい場合は、`model`に`local`を追記してください。
@@ -54,16 +53,14 @@ const agent = new Agent(scope, 'ai', {
 > | B | Bedrock APIキー | メモリの余裕がないが、ネットワークは使える |
 > | (追記なし) | モック | どちらも用意できない |
 
-> [!NOTE] B: Bedrock APIキーを使う場合
->
+> **B: Bedrock APIキーを使う場合**
 > 手順1で`AWS_BEARER_TOKEN_BEDROCK`を設定済みであることを確認し、`local`に以下を追記します。
 >
 > ```typescript
 > local: { provider: 'bedrock', modelId: 'moonshotai.kimi-k2.5' },
 > ```
 
-> [!NOTE] A: OllamaなどローカルLLMを使う場合
->
+> **A: OllamaなどローカルLLMを使う場合**
 > <details>
 > <summary>ローカルLLM(Ollama)を使う場合</summary>
 >
@@ -185,8 +182,7 @@ export const api = new ApiNamespace(scope, 'api', (context) => ({
 ↓ チャット欄を追加した版
 ![alt text](img/image-3-1.png)
 
-> [!NOTE] `useChat`を`createChatClient`としてimportする理由
->
+> **`useChat`を`createChatClient`としてimportする理由**
 > `useChat`という名前ですが、内部で`useState`等のReactフックを使わないただの関数です。
 > `use`から始まる名前だとlintツールがReactフックと誤認してしまうため、
 > `createChatClient`という別名でimportしています。

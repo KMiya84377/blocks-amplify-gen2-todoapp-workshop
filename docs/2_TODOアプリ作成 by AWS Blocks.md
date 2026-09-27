@@ -101,8 +101,7 @@ const auth = new AuthCognito(scope, 'auth', {
 export const authApi = auth.createApi();
 ```
 
-> [!TIP] passwordPolicyについて
->
+> **passwordPolicyについて**
 > `passwordPolicy`ではパスワードの要件を指定できます。
 > - `minLength: 8`: 最小文字数を8文字にする
 > - `requireDigits: true`: 数字を必須にする
@@ -184,8 +183,7 @@ function App() {
 export default App
 ```
 
-> [!TIP] ログインすると自動でsetUserが呼ばれる
->
+> **ログインすると自動でsetUserが呼ばれる**
 > ログイン状態が変わるたびに、AWS Blocks側が自動で`setUser`を呼び出してくれます。
 > `user`の値をチェックして、画面が切り替わります。
 
@@ -198,7 +196,7 @@ export default App
 6. `todo-app/.bb-data/app-auth/last-code.json`に記載された検証コード(6桁の数値)を画面に入力し、「Confirm Account」を押します。
 ![alt text](img/image-2-3.png)
 
-> [!TIP] last-code.jsonのイメージ
+> **last-code.jsonのイメージ**
 > ```json
 > {
 >   "username": "takenoko",
@@ -403,6 +401,5 @@ export default App
 
 ここまで確認できたら、次のステップ（[docs/3_AIアシスタント追加 by AWS Blocks.md](3_AIアシスタント追加%20by%20AWS%20Blocks.md)）に進んでください。
 
-> [!TIP] データの保存先
->
+> **データの保存先**
 > データは`.bb-data/`ディレクトリにファイルとして保存されます（削除すればリセットできます）。
