@@ -4,8 +4,7 @@ AWS Blocksの`KnowledgeBase`を使うと、独自のドキュメントをAgent�
 
 ここでは、LLMが学習データからは知り得ない固有の情報（飼っているペットの名前や餌やりのルール）をmdファイルに書いておき、Agentがそれを検索して「餌をあげるタスク」を提案できるようにします。
 
-> [!NOTE] 前提
->
+> **前提**
 > 本章は[3_AIアシスタント追加 by AWS Blocks.md](3_AIアシスタント追加%20by%20AWS%20Blocks.md)までの続きです。事前に完了しておいてください。[5_おまけ Todo一覧のリアルタイム自動更新.md](5_おまけ%20Todo一覧のリアルタイム自動更新.md)への依存はありません。
 
 **作業目安：15分**
@@ -67,8 +66,7 @@ const agent = new Agent(scope, 'ai', {
 });
 ```
 
-> [!NOTE] `KnowledgeBase.retrieve()`の返り値
->
+> **`KnowledgeBase.retrieve()`の返り値**
 > `retrieve()`は、関連度の高い順に並んだチャンク（`{ text, score, source, metadata }`）の配列を返します。ここでは`text`（該当箇所の本文）だけをAgentに渡しています。
 
 ## 動作確認
