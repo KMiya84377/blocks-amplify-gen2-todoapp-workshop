@@ -96,6 +96,7 @@ const auth = new AuthCognito(scope, 'auth', {
     minLength: 8,
     requireDigits: true
   },
+  crossDomain: true,
 });
 
 export const authApi = auth.createApi();
@@ -105,6 +106,9 @@ export const authApi = auth.createApi();
 > `passwordPolicy`ではパスワードの要件を指定できます。
 > - `minLength: 8`: 最小文字数を8文字にする
 > - `requireDigits: true`: 数字を必須にする
+
+> **crossDomainについて**
+> フロントエンドとAPIが別ドメインになる環境（Codespaces・AWSへのデプロイ後）でも、ログイン状態を保つための設定です。
 
 これでAWS Blocks側に認証機能を追加できました。
 
