@@ -89,7 +89,7 @@ import { Scope, AuthCognito } from '@aws-blocks/blocks';
 2. 認証(`AuthCognito`)を追加します。
 
 ```typescript title="aws-blocks/index.ts(追記)"
-const scope = new Scope('app');
+const scope = new Scope('a');
 
 const auth = new AuthCognito(scope, 'auth', {
   passwordPolicy: {
