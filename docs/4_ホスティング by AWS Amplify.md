@@ -65,6 +65,25 @@ aws sts get-caller-identity
 >
 > その場合は別の方法でクレデンシャルの設定を実施してください。
 
+### CDK Bootstrap
+
+Amplify Gen2 は裏側で CDK を利用します。
+
+CDK を初めて利用する AWS 環境・リージョンでは CDK Bootstrap という処理が必要です。
+
+[CDK Bootstrap とは？](https://docs.aws.amazon.com/ja_jp/cdk/v2/guide/bootstrapping-env.html)
+
+まだの環境であれば、[AWS マネージメントコンソール](https://us-east-1.console.aws.amazon.com/amplify/create/bootstrap?region=us-east-1)にアクセスして Bootstrap を実行してください。
+
+> **リージョンごとにBootstrapが必要**
+> 実行するリージョンごとに Bootstrap を実行する必要があります。
+>
+> バージニア北部リージョンにて CDK を利用したことがない場合は、他のリージョンで作業した実績があったとしても、本作業を実施する必要があります。
+
+5 分程度かかりますので、お待ちください。
+
+`CDKToolkit は us-east-1 リージョンですでに正常にセットアップされています。` と表示されていれば完了です。
+
 ### Sandboxへのデプロイ確認
 
 ここで一度、実際にAWSへデプロイして動作確認します。
